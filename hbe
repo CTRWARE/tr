@@ -10,7 +10,7 @@ end
 if not getgenv().MTAPIMutex then
 	loadstring(game:HttpGet("https://raw.githubusercontent.com/RectangularObject/MT-Api-v2/main/__source/mt-api%20v2.lua", true))()
 end
---[[ loadstring(game:HttpGet("https://raw.githubusercontent.com/LegoHacker1337/legohacks/main/PhysicsServiceOnClient.lua"))() ]]
+
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/RectangularObject/LinoriaLib/main/Library.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/RectangularObject/LinoriaLib/main/addons/SaveManager.lua"))()
 SaveManager:SetLibrary(Library)
@@ -26,24 +26,24 @@ local WorldToViewportPoint = Camera.WorldToViewportPoint
 local lPlayer = Players.LocalPlayer
 local players = {}
 local entities = {}
-local teamModule = nil
 
 local function updatePlayers()
-    if not getgenv().FurryHBELoaded then return end
-    
-    for _, v in pairs(Workspace:GetDescendants()) do
-        if v:IsA("Model") and v:FindFirstChildOfClass("Humanoid") and not table.find(players, v) then
-            table.insert(players, v)  -- Add NPC to players table
-        end
-    end
-
-    for _, v in pairs(players) do
-        task.spawn(function()
-            v:Update()  -- Assuming each player or NPC has an Update method
-        end)
-    end
+	if not getgenv().FurryHBELoaded then return end
+	
+	for _, v in pairs(players) do
+		task.spawn(function()
+			v:Update()
+		end)
+	end
+	
+	for _, v in pairs(Workspace:GetChildren()) do
+		if v:IsA("Model") and v:FindFirstChild("Humanoid") and not Players:GetPlayerFromCharacter(v) then
+			if not entities[v] then
+				entities[v] = v
+			end
+		end
+	end
 end
-
 
 RunService:BindToRenderStep("furryWalls", Enum.RenderPriority.Camera.Value - 1, function()
 	if not getgenv().FurryHBELoaded then return end
@@ -53,7 +53,6 @@ RunService:BindToRenderStep("furryWalls", Enum.RenderPriority.Camera.Value - 1, 
 			v:UpdateESP()
 		end)
 	end
-end)
 
 local mainWindow = Library:CreateWindow("Squares' Hitbox Extender")
 local mainTab = mainWindow:AddTab("Main")
